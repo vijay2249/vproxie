@@ -65,7 +65,6 @@ func init(){
 
 	filteredConfigMaps := FilterConfigFiles(filePaths)
 
-	// vals, err := dotenv.Read(filteredConfigMaps[".env"]...)
 	vals, err := LoadEnvConfigValues(filteredConfigMaps[".env"]...)
 
 	if err != nil {
@@ -79,7 +78,7 @@ func init(){
 	log.Println("========== ENV VALUES ==============")
 }
 
-func ModifyHeaders(reqHeaders *http.Header){
+func ModifyHeaders(reqHeaders *http.Header) {
 	for key := range *reqHeaders {
 		if slices.Contains(constant.HEADERS_TO_EXCLUDE, strings.ToLower(key)){
 			reqHeaders.Del(key)
@@ -89,11 +88,12 @@ func ModifyHeaders(reqHeaders *http.Header){
 
 func PrintHeaders(req *http.Request){
 	for key, value := range req.Header {
-		fmt.Println(key, value)
+		log.Print(key, value)
+		//fmt.Println(key, value)
 	}
 }
 
-func CreateCorelationHeader(){}
+func CreateCorelationHeader(headers *http.Header) {}
 
 func SafetyCheck(){}
  
