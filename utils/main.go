@@ -9,46 +9,68 @@ import (
 	"slices"
 	"strings"
 
-	dotenv "github.com/joho/godotenv"
-	constant "github.com/wedonttrack.org/vproxie/constant"
+	"github.com/wedonttrack.org/vproxie/constant"
 )
 
-var ENV_DIR_RELATIVE_PATH string = "../.env/"
+var ENV_DIR_RELATIVE_PATH string = "./.env/"
 
-func getAllEnvFiles() ([]string, error) {
+func GetAllConfigFiles(config_dir_paths ...string) ([]string, error) {
 	var fileNames []string
-	//TODO - error in reading file - fix it
-	err := filepath.Walk(ENV_DIR_RELATIVE_PATH, func(path string, info os.FileInfo, err error) error{
-		if err != nil {
-			//log.Panicf("unable to read file: %s", path)
-			fmt.Println(err)
-			return err
-		}
-		fileNames = append(fileNames, path)
-		return nil
-	})
+	for _, config_dir_path := range config_dir_paths {
+		err := filepath.Walk(config_dir_path, func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				log.Fatal("Error while loading directory data")
+				return err
+			}
 
-	if err != nil {
-		log.Fatal("Error while reading env files")
-		return nil, err
+			fileInfo, err := os.Stat(path)
+			if err != nil {
+				log.Fatal("Error while getting file info")
+				return err
+			}
+			if !fileInfo.IsDir() {
+				fileNames = append(fileNames, path)
+			}
+			return nil
+		})
+		
+		if err != nil {
+			log.Fatal("Error while reading config files")
+			return nil, err
+		}
 	}
 
-	return fileNames, err
+	return fileNames, nil
+}
+
+func FilterConfigFiles(filePaths []string) (map[string][]string) {
+	var configMapTypes  = make(map[string][]string) 
+	for _, value := range filePaths {
+		splitVals := strings.Split(value, ".")
+		configMapTypes[splitVals[1]] = append(configMapTypes[splitVals[1]], value)
+	}
+	return configMapTypes
 }
 
 func init(){
 	log.Println("loading env values")
-	fileNames, err := getAllEnvFiles()
+	filePaths, err := GetAllConfigFiles(constant.CONFIG_DIR_PATH)
 
 	if err != nil {
 		log.Fatal("error while reading env files")
 		return
 	}
 
-	vals, err := dotenv.Read(fileNames...)
+	fmt.Println(filePaths)
+
+	filteredConfigMaps := FilterConfigFiles(filePaths)
+
+	// vals, err := dotenv.Read(filteredConfigMaps[".env"]...)
+	vals, err := LoadEnvConfigValues(filteredConfigMaps[".env"]...)
 
 	if err != nil {
 		log.Fatal("Unable to load .env files in .env folder")
+		fmt.Println(err)
 		return
 	}
 
@@ -74,7 +96,7 @@ func PrintHeaders(req *http.Request){
 func CreateCorelationHeader(){}
 
 func SafetyCheck(){}
-
+ 
 func RouteTo(req *http.Request) string {
 	hostHeader := req.Header.Get(constant.HOST_HEADER)
 	return hostHeader

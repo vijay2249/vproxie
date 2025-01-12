@@ -10,3 +10,5 @@ var HEADERS_TO_EXCLUDE = []string{
 }
 
 var HOST_HEADER string = "Host"
+
+var CONFIG_DIR_PATH = "./config/"
