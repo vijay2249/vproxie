@@ -52,6 +52,7 @@ func FilterConfigFiles(filePaths []string) (map[string][]string) {
 	return configMapTypes
 }
 
+//loading env values
 func init(){
 	log.Println("loading env values")
 	filePaths, err := GetAllConfigFiles(constant.CONFIG_DIR_PATH)
@@ -78,18 +79,39 @@ func init(){
 	log.Println("========== ENV VALUES ==============")
 }
 
-func ModifyHeaders(reqHeaders *http.Header) {
+//loading global configs
+// var requestHeadersToRemove []string
+// var requestHeadersToModify map[string]string 
+// func init(){
+// 	requestHeadersToRemove = GlobalHeadersConfig.GetRequestHeadersToRemove()
+// 	if requestHeadersToRemove == nil { requestHeadersToRemove = make([]string, 0) }
+// 	requestHeadersToModify = GlobalHeadersConfig.GetRequestModifyHeadersMap()
+// }
+
+func DeleteHeaders(reqHeaders *http.Header) {
+	requestHeadersToRemove := GlobalHeadersConfig.GetRequestHeadersToRemove() //change this to be global instead of getting data for each request
 	for key := range *reqHeaders {
-		if slices.Contains(constant.HEADERS_TO_EXCLUDE, strings.ToLower(key)){
+		if slices.Contains(requestHeadersToRemove, key){
 			reqHeaders.Del(key)
 		}
 	}
 }
 
+func ModifyHeaders(reqHeaders *http.Header){
+	requestHeadersToModify := GlobalHeadersConfig.GetRequestModifyHeadersMap() //change this to be global instead of getting data for each request
+	for key, value := range requestHeadersToModify {
+		reqHeaders.Set(key, value)
+	}
+}
+
+func DeleteAndModifyHeaders(request *http.Header) {
+	DeleteHeaders(request)
+	ModifyHeaders(request)
+}
+
 func PrintHeaders(req *http.Request){
 	for key, value := range req.Header {
 		log.Print(key, value)
-		//fmt.Println(key, value)
 	}
 }
 

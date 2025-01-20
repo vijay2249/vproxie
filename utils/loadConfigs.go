@@ -10,8 +10,8 @@ import (
 	yaml "gopkg.in/yaml.v3"
 )
 
-var globalHeadersConfig *customTypes.HeadersConfig
-var globalHostsForwardConfig *customTypes.ForwardRequestToConfig
+var GlobalHeadersConfig *customTypes.HeadersConfig
+var GlobalHostsForwardConfig *customTypes.ForwardRequestToConfig
 
 func LoadHeadersConfig(filePaths ...string) (err error) {
 	for _, file := range filePaths {
@@ -21,14 +21,14 @@ func LoadHeadersConfig(filePaths ...string) (err error) {
 			return err
 		}
 		fmt.Println("unloading yaml configs")
-		err = yaml.Unmarshal(data, &globalHeadersConfig)
+		err = yaml.Unmarshal(data, &GlobalHeadersConfig)
 		if err != nil {
 			log.Fatal("Error while unmarshall the yaml config")
 			return err
 		}
-		if globalHeadersConfig == nil {
-			log.Printf("Required config data type is not found in %v file", file)
-		}
+		// if GlobalHeadersConfig == nil {
+		// 	log.Printf("Required config data type is not found in %v file", file)
+		// }
 	}
 	return nil
 }
@@ -41,7 +41,7 @@ func LoadHostsConfig(filePaths ...string) (err error) {
 			return err
 		}
 		fmt.Println("unloading yaml configs")
-		err = yaml.Unmarshal(data, &globalHostsForwardConfig)
+		err = yaml.Unmarshal(data, &GlobalHostsForwardConfig)
 		if err != nil {
 			log.Fatal("Error while unmarshall the yaml config")
 			return err
@@ -52,12 +52,12 @@ func LoadHostsConfig(filePaths ...string) (err error) {
 
 func PrintHeadersYamlConfig(){
 	fmt.Println("Printing yaml config")
-	fmt.Println(*globalHeadersConfig)
+	fmt.Println(*GlobalHeadersConfig)
 }
 
 func PrintHostsForwardConfigYamlConfig(){
 	fmt.Println("Printing yaml config")
-	fmt.Println(*globalHostsForwardConfig)
+	fmt.Println(*GlobalHostsForwardConfig)
 }
 
 

@@ -44,8 +44,12 @@ func init(){
 func handleRequests(w http.ResponseWriter, req *http.Request){
 
 	//copy headers
-	utils.ModifyHeaders(&req.Header)
+	utils.DeleteAndModifyHeaders(&req.Header)
 	utils.PrintHeaders(req)
+
+	//call backend service
+	userHost := req.Header.Get("Referer")
+	fmt.Println(userHost)
 }
 
 func main(){
