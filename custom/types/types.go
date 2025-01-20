@@ -1,13 +1,13 @@
 package types
 
-type Config struct {
+type HeadersConfig struct {
 	ModifyRequest ModificationConfig `yaml:"modifyRequest"`
 	ModifyResponse ModificationConfig `yaml:"modifyResponse"`
 }
 
 type ModificationConfig struct {
 	DoIt bool `yaml:"doIt"`
-	Actions Actions `yaml:"actions"`
+	Actions []Actions `yaml:"actions"`
 }
 
 type Actions struct {
@@ -20,4 +20,8 @@ type Actions struct {
 		DoIt bool `yaml:"doIt"`
 		HeadersToRemove []string `yaml:"headersToRemove"`
 	} `yaml:"removeHeaders"`
+}
+
+type ForwardRequestToConfig struct {
+	BackendServiceRoute map[string]string `yaml:"forwardRequestTo"`
 }

@@ -25,12 +25,20 @@ func init(){
 
 // load yaml config
 func init(){
-	filePaths, err := utils.GetAllConfigFiles(constant.CONFIG_DIR_PATH)
+	var err error;
+	filePaths, err = utils.GetAllConfigFiles(constant.CONFIG_DIR_PATH)
 	if err != nil {
 		log.Fatal("Error while getting config file paths")
 		return
 	}
-	fmt.Println(fmt.Printf("config files: %v", filePaths))
+
+	configMapTypes := utils.FilterConfigFiles(filePaths)
+	utils.LoadEnvConfigValues(configMapTypes["env"]...)
+	utils.LoadHeadersConfig(configMapTypes["yaml"]...)
+	utils.PrintHeadersYamlConfig()
+
+	utils.LoadHostsConfig(configMapTypes["yaml"]...)
+	utils.PrintHostsForwardConfigYamlConfig()
 }
 
 func handleRequests(w http.ResponseWriter, req *http.Request){
@@ -41,7 +49,6 @@ func handleRequests(w http.ResponseWriter, req *http.Request){
 }
 
 func main(){
-	fmt.Println(fmt.Printf("Initial value of filePaths: %v", filePaths))
 	fmt.Println("Proxy server by Vijay - for custom projects")
 	targets()
 	startServer()

@@ -3,26 +3,61 @@ package utils
 import (
 	"fmt"
 	"log"
+	"os"
 
 	dotenv "github.com/joho/godotenv"
+	customTypes "github.com/wedonttrack.org/vproxie/custom/types"
 	yaml "gopkg.in/yaml.v3"
 )
 
-var globalYaml map[string]interface{}
+var globalHeadersConfig *customTypes.HeadersConfig
+var globalHostsForwardConfig *customTypes.ForwardRequestToConfig
 
-func LoadYamlConfig(data []byte) (err error) {
-	err = yaml.Unmarshal(data, &globalYaml)
-	if err != nil {
-		log.Fatalf("Unable to load yaml config")
-		return err
+func LoadHeadersConfig(filePaths ...string) (err error) {
+	for _, file := range filePaths {
+		data, err := os.ReadFile(file)
+		if err != nil {
+			log.Fatal("Error while loading yaml file")
+			return err
+		}
+		fmt.Println("unloading yaml configs")
+		err = yaml.Unmarshal(data, &globalHeadersConfig)
+		if err != nil {
+			log.Fatal("Error while unmarshall the yaml config")
+			return err
+		}
+		if globalHeadersConfig == nil {
+			log.Printf("Required config data type is not found in %v file", file)
+		}
 	}
 	return nil
 }
 
-func PrintYamlConfig(){
-	for key, value := range globalYaml {
-		log.Println(key, ": ", value)
+func LoadHostsConfig(filePaths ...string) (err error) {
+	for _, file := range filePaths {
+		data, err := os.ReadFile(file)
+		if err != nil {
+			log.Fatal("Error while loading yaml file")
+			return err
+		}
+		fmt.Println("unloading yaml configs")
+		err = yaml.Unmarshal(data, &globalHostsForwardConfig)
+		if err != nil {
+			log.Fatal("Error while unmarshall the yaml config")
+			return err
+		}
 	}
+	return nil
+}
+
+func PrintHeadersYamlConfig(){
+	fmt.Println("Printing yaml config")
+	fmt.Println(*globalHeadersConfig)
+}
+
+func PrintHostsForwardConfigYamlConfig(){
+	fmt.Println("Printing yaml config")
+	fmt.Println(*globalHostsForwardConfig)
 }
 
 
