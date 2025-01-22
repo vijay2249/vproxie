@@ -5,8 +5,8 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/wedonttrack.org/vproxie/constant"
-	"github.com/wedonttrack.org/vproxie/utils"
+	"vproxie/constant"
+	"vproxie/utils"
 )
 
 var filePaths []string;

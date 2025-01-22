@@ -1,4 +1,4 @@
-module github.com/wedonttrack.org/vproxie
+module vproxie
 
 go 1.22.5
 

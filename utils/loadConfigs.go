@@ -6,7 +6,7 @@ import (
 	"os"
 
 	dotenv "github.com/joho/godotenv"
-	customTypes "github.com/wedonttrack.org/vproxie/custom/types"
+	customTypes "vproxie/custom/types"
 	yaml "gopkg.in/yaml.v3"
 )
 
