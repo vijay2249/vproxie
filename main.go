@@ -48,7 +48,7 @@ func handleRequests(w http.ResponseWriter, req *http.Request){
 	utils.PrintHeaders(req)
 
 	//call backend service
-	userHost := req.Header.Get("Referer")
+	userHost := req.Header.Get(constant.REFERER)
 	fmt.Println(userHost)
 }
 
