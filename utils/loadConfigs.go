@@ -6,7 +6,7 @@ import (
 	"os"
 
 	dotenv "github.com/joho/godotenv"
-	customTypes "github.com/wedonttrack.org/vproxie/custom/types"
+	customTypes "github.com/vijay2249/vproxie/custom/types"
 	yaml "gopkg.in/yaml.v3"
 )
 
@@ -73,4 +73,8 @@ func LoadEnvConfigValues(filePaths ...string) (map[string]string, error){
 		return nil, err
 	}
 	return vals, nil
+}
+
+func ValidateConfigFiles(){
+	
 }

@@ -9,7 +9,7 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/wedonttrack.org/vproxie/constant"
+	"github.com/vijay2249/vproxie/constant"
 )
 
 var ENV_DIR_RELATIVE_PATH string = "./.env/"

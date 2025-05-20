@@ -1,0 +1,27 @@
+modifyRequest:
+  doIt: true
+  actions:
+    modifyHeaders:
+      doIt: false
+      headersToModify:
+        header1: value1
+        header2: value2
+    removeHeaders:
+      doIt: true
+      headersToRemove:
+      - header1
+      - header2
+
+modifyResponse:
+  doIt: true
+  actions:
+    modifyHeaders:
+      doIt: false
+      headersToModify:
+        header1: value1
+        header2: value2
+    removeHeaders:
+      doIt: true
+      headersToRemove:
+      - header1
+      - header2

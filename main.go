@@ -5,8 +5,8 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/wedonttrack.org/vproxie/constant"
-	"github.com/wedonttrack.org/vproxie/utils"
+	"github.com/vijay2249/vproxie/constant"
+	"github.com/vijay2249/vproxie/utils"
 )
 
 var filePaths []string;
@@ -20,7 +20,15 @@ func init(){
 	|| / /   ____  //   ) ) //  ) ) //   ) ) \\ / /  / / //___) )     //   ) ) //   / /   || / / //        // |  / /   
 	||/ /         //___/ / //      //   / /   \/ /  / / //           //   / / ((___/ /    ||/ / //        //  | / /    
 	|  /         //       //      ((___/ /    / /\ / / ((____       ((___/ /      / /     |  / ((____/ / //   |/ /     
+	
+																																											- VijayCN
 	`)
+}
+
+
+func init(){
+	fmt.Println("Validate whether config files are present or not")
+	utils.ValidateConfigFiles()
 }
 
 // load yaml config
@@ -74,8 +82,8 @@ func startServer(){
 
 func targets(){
 	fmt.Println(`
-	1. .env file to store the hosts and based on that host - send to respective backend server
-	2. Dummy backend server to get the responses
-	3. Authentication on both proxy and backend server
+	[x] .env file to store the hosts and based on that host - send to respective backend server
+	[ ] Dummy backend server to get the responses
+	[ ] Authentication on both proxy and backend server
 	`)
 }

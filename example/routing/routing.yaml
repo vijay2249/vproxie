@@ -1,0 +1,3 @@
+forwardRequestTo:
+  subdomain1: server1
+  subdomain2: server2
