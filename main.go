@@ -9,7 +9,10 @@ import (
 	"github.com/vijay2249/vproxie/utils"
 )
 
-var filePaths []string;
+var (
+	filePaths []string;
+	configMapTypes map[string][]string
+)
 
 // BANNER
 func init(){
@@ -25,28 +28,42 @@ func init(){
 	`)
 }
 
-
 func init(){
-	fmt.Println("Validate whether config files are present or not")
-	utils.ValidateConfigFiles()
-}
-
-// load yaml config
-func init(){
-	var err error;
+	// get config giles
+	var err error
 	filePaths, err = utils.GetAllConfigFiles(constant.CONFIG_DIR_PATH)
 	if err != nil {
-		log.Fatal("Error while getting config file paths")
+		utils.ErrorLogger.Println("unable to get config file paths")
+		utils.ErrorLogger.Println(err)
+		return
+	}
+	utils.InfoLogger.Printf("config filePaths: %v", filePaths)
+
+	configMapTypes = utils.FilterConfigFiles(filePaths)
+
+	// validate if all config files are present or not, if not <idk>
+
+	// load env config values
+	utils.InfoLogger.Println("Loaing env config files - start")
+	// envConfigValues
+	_, err = utils.LoadEnvConfigValues(configMapTypes[constant.ENV]...)
+	if err != nil {
+		utils.ErrorLogger.Println("Unable to load env config values, please check error")
+		utils.ErrorLogger.Println(err)
+		utils.ErrorLogger.Println("Loaing env config files - failure")
 		return
 	}
 
-	configMapTypes := utils.FilterConfigFiles(filePaths)
-	utils.LoadEnvConfigValues(configMapTypes["env"]...)
-	utils.LoadHeadersConfig(configMapTypes["yaml"]...)
-	utils.PrintHeadersYamlConfig()
+	utils.InfoLogger.Println("Loading env config files - completed")
 
-	utils.LoadHostsConfig(configMapTypes["yaml"]...)
+	// load yaml config values
+	utils.InfoLogger.Println("Loading yaml config details - start")
+	utils.LoadYamlConfigValues(configMapTypes[constant.YAML]...)
+	utils.InfoLogger.Println("Loading yaml config details - completed")
+
+	utils.PrintHeadersYamlConfig()
 	utils.PrintHostsForwardConfigYamlConfig()
+	utils.PrintLoggingConfigs()
 }
 
 func handleRequests(w http.ResponseWriter, req *http.Request){

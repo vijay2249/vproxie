@@ -1,4 +1,4 @@
-package utils
+package route_utils
 
 
 func GetRouteConfig(){}

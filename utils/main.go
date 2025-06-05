@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/vijay2249/vproxie/constant"
+	file_utils "github.com/vijay2249/vproxie/utils/file_utils"
 )
 
 var ENV_DIR_RELATIVE_PATH string = "./.env/"
@@ -19,13 +20,13 @@ func GetAllConfigFiles(config_dir_paths ...string) ([]string, error) {
 	for _, config_dir_path := range config_dir_paths {
 		err := filepath.Walk(config_dir_path, func(path string, info os.FileInfo, err error) error {
 			if err != nil {
-				log.Fatal("Error while loading directory data")
+				ErrorLogger.Println("Error while loading directory data")
 				return err
 			}
 
 			fileInfo, err := os.Stat(path)
 			if err != nil {
-				log.Fatal("Error while getting file info")
+				ErrorLogger.Println("Error while getting file info")
 				return err
 			}
 			if !fileInfo.IsDir() {
@@ -35,7 +36,7 @@ func GetAllConfigFiles(config_dir_paths ...string) ([]string, error) {
 		})
 		
 		if err != nil {
-			log.Fatal("Error while reading config files")
+			ErrorLogger.Println("Error while reading config files")
 			return nil, err
 		}
 	}
@@ -53,9 +54,9 @@ func FilterConfigFiles(filePaths []string) (map[string][]string) {
 }
 
 //loading env values
-func init(){
+func LoadEnvConfigValues1(){
 	log.Println("loading env values")
-	filePaths, err := GetAllConfigFiles(constant.CONFIG_DIR_PATH)
+	filePaths, err := file_utils.GetAllFileNamesInFolderAndSubFolder(constant.CONFIG_DIR_PATH)
 
 	if err != nil {
 		log.Fatal("error while reading env files")
@@ -66,7 +67,7 @@ func init(){
 
 	filteredConfigMaps := FilterConfigFiles(filePaths)
 
-	vals, err := LoadEnvConfigValues(filteredConfigMaps[".env"]...)
+	vals, err := LoadEnvConfigValues(filteredConfigMaps["env"]...)
 
 	if err != nil {
 		log.Fatal("Unable to load .env files in .env folder")
@@ -78,15 +79,6 @@ func init(){
 	log.Println(vals)
 	log.Println("========== ENV VALUES ==============")
 }
-
-//loading global configs
-// var requestHeadersToRemove []string
-// var requestHeadersToModify map[string]string 
-// func init(){
-// 	requestHeadersToRemove = GlobalHeadersConfig.GetRequestHeadersToRemove()
-// 	if requestHeadersToRemove == nil { requestHeadersToRemove = make([]string, 0) }
-// 	requestHeadersToModify = GlobalHeadersConfig.GetRequestModifyHeadersMap()
-// }
 
 func DeleteHeaders(reqHeaders *http.Header) {
 	requestHeadersToRemove := GlobalHeadersConfig.GetRequestHeadersToRemove() //change this to be global instead of getting data for each request
