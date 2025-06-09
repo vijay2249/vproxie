@@ -12,6 +12,7 @@ const (
 
 	//config constants
 	CONFIG_DIR_PATH = "./config/"
+	TOTAL_CUSTOM_CONFIGS = 3 //!!!change this if adding more custom types!!!
 
 	//LOGGING constants
 	WARN string = "warn"

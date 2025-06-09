@@ -4,6 +4,7 @@ import (
 	"os"
 	"reflect"
 
+	"github.com/vijay2249/vproxie/constant"
 	customTypes "github.com/vijay2249/vproxie/custom/types"
 	yaml "gopkg.in/yaml.v3"
 )
@@ -13,8 +14,6 @@ var (
   GlobalHostsForwardConfig *customTypes.ForwardRequestToConfig
   GlobalLoggingConfig *customTypes.LoggingConfig
 )
-
-var ConfigsToLoad = []interface{}{&GlobalHeadersConfig , &GlobalHostsForwardConfig, &GlobalLoggingConfig}
 
 func PrintHeadersYamlConfig(){
 	InfoLogger.Println("Printing headers yaml config")
@@ -41,25 +40,37 @@ func LoadYamlConfigValues(filePaths ...string) error {
 		}
 		InfoLogger.Printf("unloading yaml config from %v", file)
 
-		err = UnmarshallYamlConfig(data)
-		if err != nil {
-			ErrorLogger.Printf("Error while loading config from %v file", file)
-			return err
+
+		channels := make([]chan error, constant.TOTAL_CUSTOM_CONFIGS)
+		go UnmarshallEachConfig(data, GlobalHeadersConfig, channels[0])
+		go UnmarshallEachConfig(data, GlobalHostsForwardConfig, channels[1])
+		go UnmarshallEachConfig(data, GlobalLoggingConfig, channels[2])
+
+		for _, chans := range channels {
+			InfoLogger.Println("inside channels for loop")
+			err := <- chans
+			InfoLogger.Println(err)
+			InfoLogger.Println("inside channels for loop")
+			if err != nil {
+				ErrorLogger.Fatalf("Error while loading yaml configs, please revalidate")
+			}
+			close(chans)
 		}
 	}
 	return nil
 }
 
-
-func UnmarshallYamlConfig(data []byte) (err error) {
-	for _, config := range ConfigsToLoad {
-		configDataType := reflect.TypeOf(config)
-		InfoLogger.Printf("Loading yaml config for %v", configDataType)
-		err = yaml.Unmarshal(data, config)
-		if err != nil {
-			ErrorLogger.Printf("Error while loading %v config", configDataType)
-			return err
-		}
+func UnmarshallEachConfig(data []byte, config interface{}, channel chan error) {
+	configDataType := reflect.TypeOf(config)
+	InfoLogger.Printf("Loading yaml config for %v", configDataType)
+	err := yaml.Unmarshal(data, &config)
+	InfoLogger.Println("before")
+	InfoLogger.Println(&config)
+	if err != nil {
+		ErrorLogger.Printf("Error while loading %v config", configDataType)
+		channel <- err
 	}
-	return nil
+	InfoLogger.Println("after")
+	InfoLogger.Println(&config)
+	channel <- nil
 }
