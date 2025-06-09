@@ -2,7 +2,6 @@ package utils
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"reflect"
 
@@ -17,58 +16,7 @@ var (
   GlobalLoggingConfig *customTypes.LoggingConfig
 )
 
-var ConfigsToLoad = []any{GlobalHeadersConfig , GlobalHostsForwardConfig, GlobalLoggingConfig}
-
-func LoadHeadersConfig(filePaths ...string) (err error) {
-	for _, file := range filePaths {
-		data, err := os.ReadFile(file)
-		if err != nil {
-			log.Fatal("Error while loading yaml file")
-			return err
-		}
-		fmt.Println("unloading headers yaml configs")
-		err = yaml.Unmarshal(data, &GlobalHeadersConfig)
-		if err != nil {
-			log.Fatal("Error while unmarshall the yaml config")
-			return err
-		}
-	}
-	return nil
-}
-
-func LoadHostsConfig(filePaths ...string) (err error) {
-	for _, file := range filePaths {
-		data, err := os.ReadFile(file)
-		if err != nil {
-			log.Fatal("Error while loading yaml file")
-			return err
-		}
-		fmt.Println("unloading hosts yaml configs")
-		err = yaml.Unmarshal(data, &GlobalHostsForwardConfig)
-		if err != nil {
-			log.Fatal("Error while unmarshall the yaml config")
-			return err
-		}
-	}
-	return nil
-}
-
-func LoadLoggingConfig(filePaths ...string) (err error) {
-	for _, file := range filePaths {
-		data, err := os.ReadFile(file)
-		if err != nil {
-			log.Fatal("Error while loading yaml file")
-			return err
-		}
-		fmt.Println("unloading logging yaml configs")
-		err = yaml.Unmarshal(data, &GlobalLoggingConfig)
-		if err != nil {
-			log.Fatal("Error while unmarshall the yaml config")
-			return err
-		}
-	}
-	return nil
-}
+var ConfigsToLoad = []interface{}{GlobalHeadersConfig , GlobalHostsForwardConfig, GlobalLoggingConfig}
 
 func PrintHeadersYamlConfig(){
 	fmt.Println("Printing headers yaml config")
@@ -111,7 +59,7 @@ func LoadYamlConfigValues(filePaths ...string) error {
 		}
 		InfoLogger.Printf("unloading yaml config from %v", file)
 
-		err = UnmarshallYamlConfig(data, ConfigsToLoad...)
+		err = UnmarshallYamlConfig(data)
 		if err != nil {
 			ErrorLogger.Printf("Error while loading config from %v file", file)
 			return err
@@ -121,8 +69,8 @@ func LoadYamlConfigValues(filePaths ...string) error {
 }
 
 
-func UnmarshallYamlConfig(data []byte, configsToLoad ...any) (err error) {
-	for _, config := range configsToLoad {
+func UnmarshallYamlConfig(data []byte) (err error) {
+	for _, config := range ConfigsToLoad {
 		configDataType := reflect.TypeOf(config)
 		fmt.Println("Before")
 		fmt.Println(config)
@@ -135,5 +83,8 @@ func UnmarshallYamlConfig(data []byte, configsToLoad ...any) (err error) {
 		fmt.Println("After")
 		fmt.Println(config)
 	}
+
+	fmt.Println("Headers config")
+	fmt.Println(GlobalHeadersConfig)
 	return nil
 }
