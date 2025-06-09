@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -10,7 +9,6 @@ import (
 	"strings"
 
 	"github.com/vijay2249/vproxie/constant"
-	file_utils "github.com/vijay2249/vproxie/utils/file_utils"
 )
 
 var ENV_DIR_RELATIVE_PATH string = "./.env/"
@@ -53,32 +51,6 @@ func FilterConfigFiles(filePaths []string) (map[string][]string) {
 	return configMapTypes
 }
 
-//loading env values
-func LoadEnvConfigValues1(){
-	log.Println("loading env values")
-	filePaths, err := file_utils.GetAllFileNamesInFolderAndSubFolder(constant.CONFIG_DIR_PATH)
-
-	if err != nil {
-		log.Fatal("error while reading env files")
-		return
-	}
-
-	fmt.Println(filePaths)
-
-	filteredConfigMaps := FilterConfigFiles(filePaths)
-
-	vals, err := LoadEnvConfigValues(filteredConfigMaps["env"]...)
-
-	if err != nil {
-		log.Fatal("Unable to load .env files in .env folder")
-		fmt.Println(err)
-		return
-	}
-
-	log.Println("========== ENV VALUES ==============")
-	log.Println(vals)
-	log.Println("========== ENV VALUES ==============")
-}
 
 func DeleteHeaders(reqHeaders *http.Header) {
 	requestHeadersToRemove := GlobalHeadersConfig.GetRequestHeadersToRemove() //change this to be global instead of getting data for each request

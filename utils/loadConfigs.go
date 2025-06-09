@@ -1,11 +1,9 @@
 package utils
 
 import (
-	"fmt"
 	"os"
 	"reflect"
 
-	dotenv "github.com/joho/godotenv"
 	customTypes "github.com/vijay2249/vproxie/custom/types"
 	yaml "gopkg.in/yaml.v3"
 )
@@ -16,37 +14,21 @@ var (
   GlobalLoggingConfig *customTypes.LoggingConfig
 )
 
-var ConfigsToLoad = []interface{}{GlobalHeadersConfig , GlobalHostsForwardConfig, GlobalLoggingConfig}
+var ConfigsToLoad = []interface{}{&GlobalHeadersConfig , &GlobalHostsForwardConfig, &GlobalLoggingConfig}
 
 func PrintHeadersYamlConfig(){
-	fmt.Println("Printing headers yaml config")
-	fmt.Println(*GlobalHeadersConfig)
+	InfoLogger.Println("Printing headers yaml config")
+	InfoLogger.Println(*GlobalHeadersConfig)
 }
 
 func PrintHostsForwardConfigYamlConfig(){
-	fmt.Println("Printing hosts yaml config")
-	fmt.Println(*GlobalHostsForwardConfig)
+	InfoLogger.Println("Printing hosts yaml config")
+	InfoLogger.Println(*GlobalHostsForwardConfig)
 }
 
 func PrintLoggingConfigs(){
-	fmt.Println("Logging configs")
-	fmt.Println(*GlobalLoggingConfig)
-}
-
-func LoadEnvConfigValues(filePaths ...string) (map[string]string, error){
-	InfoLogger.Printf("env config files: %v", filePaths)
-	var err error
-	if len(filePaths) == 0 {
-		WarnLogger.Println("config files are empty, ignoring this loading env configs")
-		return make(map[string]string, 0), nil
-	}
-	vals, err := dotenv.Read(filePaths...)
-	InfoLogger.Println("Completed loading env config details")
-	if err != nil {
-		ErrorLogger.Println("Unable to load env config files")
-		return nil, err
-	}
-	return vals, nil
+	InfoLogger.Println("Logging configs")
+	InfoLogger.Println(*GlobalLoggingConfig)
 }
 
 func LoadYamlConfigValues(filePaths ...string) error {
@@ -72,19 +54,12 @@ func LoadYamlConfigValues(filePaths ...string) error {
 func UnmarshallYamlConfig(data []byte) (err error) {
 	for _, config := range ConfigsToLoad {
 		configDataType := reflect.TypeOf(config)
-		fmt.Println("Before")
-		fmt.Println(config)
 		InfoLogger.Printf("Loading yaml config for %v", configDataType)
-		err = yaml.Unmarshal(data, &config)
+		err = yaml.Unmarshal(data, config)
 		if err != nil {
 			ErrorLogger.Printf("Error while loading %v config", configDataType)
 			return err
 		}
-		fmt.Println("After")
-		fmt.Println(config)
 	}
-
-	fmt.Println("Headers config")
-	fmt.Println(GlobalHeadersConfig)
 	return nil
 }

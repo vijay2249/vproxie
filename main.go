@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
@@ -16,7 +15,7 @@ var (
 
 // BANNER
 func init(){
-	fmt.Println(`
+	utils.InfoLogger.Println(`
 																																																										 
 	||   / /                                                                              ||   / / //   ) )  /|    / / 
 	||  / /          ___      __      ___             ( )  ___         / __               ||  / / //        //|   / /  
@@ -43,19 +42,6 @@ func init(){
 
 	// validate if all config files are present or not, if not <idk>
 
-	// load env config values
-	utils.InfoLogger.Println("Loaing env config files - start")
-	// envConfigValues
-	_, err = utils.LoadEnvConfigValues(configMapTypes[constant.ENV]...)
-	if err != nil {
-		utils.ErrorLogger.Println("Unable to load env config values, please check error")
-		utils.ErrorLogger.Println(err)
-		utils.ErrorLogger.Println("Loaing env config files - failure")
-		return
-	}
-
-	utils.InfoLogger.Println("Loading env config files - completed")
-
 	// load yaml config values
 	utils.InfoLogger.Println("Loading yaml config details - start")
 	utils.LoadYamlConfigValues(configMapTypes[constant.YAML]...)
@@ -74,11 +60,11 @@ func handleRequests(w http.ResponseWriter, req *http.Request){
 
 	//call backend service
 	userHost := req.Header.Get(constant.REFERER)
-	fmt.Println(userHost)
+	utils.InfoLogger.Println(userHost)
 }
 
 func main(){
-	fmt.Println("Proxy server by Vijay - for custom projects")
+	utils.InfoLogger.Println("Proxy server by Vijay - for custom projects")
 	targets()
 	startServer()
 }
@@ -98,7 +84,7 @@ func startServer(){
 
 
 func targets(){
-	fmt.Println(`
+	utils.InfoLogger.Println(`
 	[x] .env file to store the hosts and based on that host - send to respective backend server
 	[ ] Dummy backend server to get the responses
 	[ ] Authentication on both proxy and backend server
