@@ -30,8 +30,18 @@ func init(){
 func GetLogger(){}
 
 // <Time> - <endpoint> - <response> - <request id>
-func PrintMessage(){
+func PrintMessage(loggingLevel string, message any){
 	
+	switch loggingLevel {
+	case constant.ERROR:
+		ErrorLogger.Fatalln(message)
+	case constant.INFO:
+		InfoLogger.Println(message)
+	case constant.DEBUG:
+		DebugLogger.Println(message)
+	case constant.WARN:
+		WarnLogger.Println(message)
+	}
 }
 
 // Print message to terminal or file as metioned in config file

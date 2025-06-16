@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -75,7 +74,7 @@ func DeleteAndModifyHeaders(request *http.Header) {
 
 func PrintHeaders(req *http.Request){
 	for key, value := range req.Header {
-		log.Print(key, value)
+		InfoLogger.Print(key, value)
 	}
 }
 
