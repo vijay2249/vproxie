@@ -3,19 +3,12 @@ package route_utils
 import (
 	"errors"
 	"net/http"
-	"os"
+	// "os"
 
 	"github.com/vijay2249/vproxie/utils"
 )
 
 var ROUTING_CONFIG = utils.GlobalRoutingConfig
-
-func init(){
-	if ROUTING_CONFIG == nil {
-		utils.ErrorLogger.Fatalf("Unable to get routing config, please check the config file")
-		os.Exit(0)
-	}
-}
 
 func GetBackendServiceURL(domain, subdomain, endpoint string) (url string, err error) {
 	//return default root service
@@ -34,7 +27,7 @@ func GetBackendServiceURL(domain, subdomain, endpoint string) (url string, err e
 		if err != nil { return "", err }
 		return url, nil
 	}
-	
+
 	utils.WarnLogger.Printf("No such subdomain exists to route request to. Please check configurations")
 	return "", errors.ErrUnsupported
 }
