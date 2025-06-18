@@ -5,6 +5,7 @@ import (
 
 	"github.com/vijay2249/vproxie/constant"
 	"github.com/vijay2249/vproxie/utils"
+	route_utils "github.com/vijay2249/vproxie/utils/route"
 )
 
 var (
@@ -65,12 +66,18 @@ func handleRequests(w http.ResponseWriter, req *http.Request){
 	utils.PrintHeaders(req)
 
 
+			// validate request payload details --- START
+			// validate request payload details --- END
+
+
 	// ----- modify request details  END --------
 
 
 	//call backend service
 	userHost := req.Header.Get(constant.REFERER)
 	utils.InfoLogger.Println(userHost)
+
+	route_utils.GetResponseFromHost(req)
 
 	// ----- modify response details  START ------
 

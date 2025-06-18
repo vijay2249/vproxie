@@ -10,11 +10,11 @@ import (
 
 var (
 	GlobalHeadersConfig *customTypes.HeadersConfig
-  GlobalHostsForwardConfig *customTypes.ForwardRequestToConfig
+  GlobalRoutingConfig *customTypes.RoutingConfig
   GlobalLoggingConfig *customTypes.LoggingConfig
 )
 
-var ConfigsToLoad = []interface{}{&GlobalHeadersConfig, &GlobalHostsForwardConfig, &GlobalLoggingConfig}
+var ConfigsToLoad = []interface{}{&GlobalHeadersConfig, &GlobalRoutingConfig, &GlobalLoggingConfig}
 
 func PrintHeadersYamlConfig(){
 	InfoLogger.Println("Printing headers yaml config")
@@ -23,7 +23,7 @@ func PrintHeadersYamlConfig(){
 
 func PrintHostsForwardConfigYamlConfig(){
 	InfoLogger.Println("Printing hosts yaml config")
-	InfoLogger.Println(*GlobalHostsForwardConfig)
+	InfoLogger.Println(*GlobalRoutingConfig)
 }
 
 func PrintLoggingConfigs(){
