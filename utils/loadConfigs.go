@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	GlobalHeadersConfig *customTypes.HeadersConfig
+  GlobalHeadersConfig *customTypes.HeadersConfig
   GlobalRoutingConfig *customTypes.RoutingConfig
   GlobalLoggingConfig *customTypes.LoggingConfig
 )
@@ -68,13 +68,9 @@ func UnmarshallEachConfig(data []byte, config interface{}) (err error){
 	configDataType := reflect.TypeOf(config)
 	InfoLogger.Printf("Loading yaml config for %v", configDataType)
 	err = yaml.Unmarshal(data, &config)
-	InfoLogger.Println("before")
-	InfoLogger.Println(&config)
 	if err != nil {
 		ErrorLogger.Printf("Error while loading %v config", configDataType)
 		return err
 	}
-	InfoLogger.Println("after")
-	InfoLogger.Println(&config)
 	return nil
 }

@@ -1,6 +1,8 @@
 package main
 
 import (
+	"os"
+	"errors"
 	"net/http"
 
 	"github.com/vijay2249/vproxie/constant"
@@ -23,71 +25,83 @@ func init(){
 	||/ /         //___/ / //      //   / /   \/ /  / / //           //   / / ((___/ /    ||/ / //        //  | / /    
 	|  /         //       //      ((___/ /    / /\ / / ((____       ((___/ /      / /     |  / ((____/ / //   |/ /     
 	
-																																											- VijayCN
+																											- VijayCN
+	`)
+}
+
+// project targets
+func init(){
+	utils.InfoLogger.Println(`
+	[x] .yaml file to store the hosts and based on that host - send to respective backend server
+	[x] add logging mechanism
+
+	// TODO
+	[ ] make port and server address configurable
+	[ ] remove PII related metadata from files
+	[ ] files uploaded should be validated from virustotal first then should be send to backend servers
+	[ ] Dummy backend server to get the responses
+	[ ] Authentication on both proxy and backend server
 	`)
 }
 
 func init(){
-	// get config giles
+	// get config files
 	var err error
 	filePaths, err = utils.GetAllConfigFiles(constant.CONFIG_DIR_PATH)
 	if err != nil {
 		utils.ErrorLogger.Println("unable to get config file paths")
-		utils.ErrorLogger.Println(err)
+		utils.ErrorLogger.Fatal(err)
 		return
 	}
 	utils.InfoLogger.Printf("config filePaths: %v", filePaths)
 
 	configMapTypes = utils.FilterConfigFiles(filePaths)
 
-	// validate if all config files are present or not, if not <idk>
-
 	// load yaml config values
 	utils.InfoLogger.Println("Loading yaml config details - start")
 	utils.LoadYamlConfigValues(configMapTypes[constant.YAML]...)
 	utils.InfoLogger.Println("Loading yaml config details - completed")
 
+	// print configurations to check if load function is working or not
 	utils.PrintHeadersYamlConfig()
 	utils.PrintHostsForwardConfigYamlConfig()
 	utils.PrintLoggingConfigs()
+
+	// run all necessary functions to populate necessary details in utilities
+	route_utils.InitRouteUtils()
 }
 
 func handleRequests(w http.ResponseWriter, req *http.Request){
 
+	defer req.Body.Close()
+	
+	// validate connection details
+	// check for HTTPS connection and check for valid SSL certificate 
+	// check for blocked IP connections and blocked fingerprints
+	
+	//format request details --- START
+	// delete metadata from request
+	// copy headers  --- START
+	// utils.PrintHeaders(req)
+	route_utils.FormatHeaders(&req.Header, constant.REQUEST)
+	// delete metadata from request payload
+	
 
-	// validate request connection status
-	/*
-	validate SSL certificate, check blocked IP requests, check connection type(secure or not)
-	*/
-
-	// ----- modify request details  START ------
-	// modify request headers
-	utils.DeleteAndModifyHeaders(&req.Header)
-	utils.PrintHeaders(req)
-
-
-			// validate request payload details --- START
-			// validate request payload details --- END
-
-
-	// ----- modify request details  END --------
-
-
-	//call backend service
+	// get backend service URL  --- START
 	userHost := req.Header.Get(constant.REFERER)
 	utils.InfoLogger.Println(userHost)
+	var host, endpoint = req.Host, req.URL.Path
+	utils.InfoLogger.Printf("host: %s, endpoint: %s\n", host, endpoint)
+	backendServerURL := route_utils.FindServerURL(host, endpoint)
 
-	route_utils.GetResponseFromHost(req)
+	// get response from server
+	serverResponse := route_utils.GetResponseFromServer(backendServerURL, req)
 
-	// ----- modify response details  START ------
+	// format response from server
+	route_utils.FormatHeaders(&serverResponse.Header, constant.RESPONSE)
 
-	// get response from backend service
-	// modify headers from response
-	// modify additional metadata details from response
-	// send response to user
-
-	// ----- modify request details  END ------
-
+	// return response to user
+	route_utils.CastResponseToResponseWriter(&serverResponse, &w)
 }
 
 func main(){
@@ -97,22 +111,17 @@ func main(){
 
 func startServer(){
 	server := http.Server{
-		Addr: ":8080",
+		Addr: ":8080", //TODO - make it configurable
 		Handler: http.HandlerFunc(handleRequests),
 	}
 
 	utils.InfoLogger.Println("Starting proxy server on :8080")
 	err := server.ListenAndServe()
-	if err != nil {
+	// server.ListenAndServeTLS()
+	if errors.Is(err, http.ErrServerClosed){
+		utils.InfoLogger.Println("Server closed gracefully")
+	}else if err != nil {
 		utils.ErrorLogger.Fatal("Error starting proxy server: ", err)
+		os.Exit(1)
 	}
-}
-
-
-func init(){
-	utils.InfoLogger.Println(`
-	[x] .env file to store the hosts and based on that host - send to respective backend server
-	[ ] Dummy backend server to get the responses
-	[ ] Authentication on both proxy and backend server
-	`)
 }

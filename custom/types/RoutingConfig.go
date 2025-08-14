@@ -3,8 +3,6 @@ package types
 import (
 	"errors"
 	"log"
-
-	// "github.com/vijay2249/vproxie/constant"
 )
 
 type RoutingConfig struct {
@@ -13,71 +11,89 @@ type RoutingConfig struct {
 
 type Routing struct {
 	Domain string `yaml:"domain"`
+	DefaultServer string `yaml:"default"`
 	SubdomainRouting map[string]string `yaml:"subdomainRouting"`
 	EndpointRouting map[string]string `yaml:"endpointRouting"`
 }
 
-func EmptyRoute() Routing {
-	return Routing{"", make(map[string]string, 0), make(map[string]string, 0)}
-}
+func EmptyRoutingStruct() Routing { return Routing {"", "", make(map[string]string, 0), make(map[string]string, 0)} }
 
-func init(){
-	necessaryFlags := log.Ldate|log.LUTC|log.Lshortfile
-	log.SetFlags(necessaryFlags)
-}
+/*
+   -------------------------    TODO 
+	 1. Add interface to give user to write custom function to get service url from subdomain and endpoint configuration
+*/
 
-func (config *RoutingConfig) GetRoutingDetailsByDomain(domain string) (Routing, error) {
-	for _, routing := range config.Routing {
-		if routing.Domain == domain {
-			return routing, nil
+func (config *RoutingConfig) GetDomainConfigDetails(domain string) (Routing, error) {
+	for _, routeConfig := range config.Routing {
+		if routeConfig.Domain == domain {
+			return routeConfig, nil
 		}
 	}
-	log.Printf("no config present to route traffic for domain: %s\n", domain)
-	return EmptyRoute(), errors.ErrUnsupported
+	log.Printf("no such config found for domain: %s\n", domain)
+	return EmptyRoutingStruct(), errors.New("no such config found for domain: " + domain + "\n")
 }
 
-func (config *Routing) GetURLBySubdomain(subdomain string) (string, error) {
-	if url, ok := config.SubdomainRouting[subdomain]; ok {
-		return url, nil
+func (config *RoutingConfig) GetAllDomains() (domains []string) {
+	if config == nil {
+		log.Fatalf("no domains mentioned in config to forward requests to, please check configuration file again.")
 	}
-	log.Printf("no config to present to route %s subdomain request\n", subdomain)
-	return "", errors.ErrUnsupported
-}
-
-func (config *Routing) GetURLByEndpoint(endpoint string) (string, error) {
-	if url, ok := config.EndpointRouting[endpoint]; ok {
-		return url, nil
+	for _, routing := range config.Routing {
+		domains = append(domains, routing.Domain)
 	}
-	log.Printf("no config to present to route %s endpoint request\n", endpoint)
-	return "", errors.ErrUnsupported
+	return domains
 }
 
-func (config *RoutingConfig) GetBackendServiceURLBySubdomain(domain, subdomain string) (string, error) {
-	routing, err := config.GetRoutingDetailsByDomain(domain)
+func (config *Routing) GetServiceURLBySubdomain(subdomain string) (string, error) {
+	if routeConfig, ok := config.SubdomainRouting[subdomain]; ok {
+		return routeConfig, nil
+	} else {
+		log.Printf("no such subdomain config found for subdomain: %s\n", subdomain)
+    return "", errors.New("no such subdomain config found for subdomain: " + subdomain + "\n")
+	}
+}
+
+func (config *Routing) GetServiceURLByEndPoint(endpoint string) (string, error) {
+	if routeConfig, ok := config.EndpointRouting[endpoint]; ok {
+		return routeConfig, nil
+	} else {
+		log.Printf("no such endpoint config found for endpoint: %s\n", endpoint)
+		return "", errors.New("no such endpoint config found for endpoint: " + endpoint + "\n")
+	}
+}
+
+func (config *Routing) GetDefaultServiceURL() string { return config.DefaultServer }
+
+func (config *RoutingConfig) GetRoutingByDomain(domain, subdomain string) (string, error) {
+	routing, err := config.GetDomainConfigDetails(domain)
 	if err != nil {
-		log.Printf("please revalidate config values")
-		return "", errors.ErrUnsupported
+		log.Printf("error getting routing for domain: %s\n", domain)
+		return "", err
 	}
-
-	url, err := routing.GetURLBySubdomain(subdomain)
+	serviceURL, err := routing.GetServiceURLBySubdomain(subdomain)
 	if err != nil {
-		log.Printf("please revalidate config values")
-		return "", errors.ErrUnsupported
+		log.Printf("error getting service url for subdomain: %s\n", subdomain)
+    return "", err
 	}
-	return url, nil
+	return serviceURL, nil
 }
 
-func (config *RoutingConfig) GetBackendServiceURLByEndpoint(domain, endpoint string) (string, error) {
-	routing, err := config.GetRoutingDetailsByDomain(domain)
+func (config *RoutingConfig) GetRoutingByEndpoint(domain, endpoint string) (string, error) {
+	routing, err := config.GetDomainConfigDetails(domain)
 	if err != nil {
-		log.Printf("please revalidate config values")
-		return "", errors.ErrUnsupported
+		log.Printf("error getting routing for domain: %s\n", domain)
+		return "", err
 	}
-
-	url, err := routing.GetURLByEndpoint(endpoint)
+	serviceURL, err := routing.GetServiceURLByEndPoint(endpoint)
 	if err != nil {
-		log.Printf("please revalidate config values")
-		return "", errors.ErrUnsupported
+		log.Printf("error getting service url for endpoint: %s\n", endpoint)
+    return "", err
 	}
-	return url, nil
+	return serviceURL, nil
 }
+
+
+type Port struct {
+	Port string `yaml:"port"`
+}
+
+func (config *Port) GetPortNumber() string { return config.Port }

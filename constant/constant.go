@@ -21,4 +21,14 @@ const (
 	TRACE string = "trace"
 	ERROR string = "error"
 	LOG_TIME_FORMAT string = "DD-MM-YYY hh:mm:ss ±hh:mm" //<day>-<month>-<year> <hour>:<minutes>:<seconds> <timezone>
+
+	//routing config constants
+	NO_URL string = "NO URL"
+
+	REQUEST string = "request"
+	RESPONSE string = "response"
+
+	//ENV files constants
+	ENV_DIR_RELATIVE_PATH string = "./.env/"
+
 )

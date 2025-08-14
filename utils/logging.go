@@ -3,8 +3,6 @@ package utils
 import (
 	"log"
 	"os"
-
-	"github.com/vijay2249/vproxie/constant"
 )
 
 var (
@@ -30,29 +28,10 @@ func init(){
 func GetLogger(){}
 
 // <Time> - <endpoint> - <response> - <request id>
-func PrintMessage(loggingLevel string, message any){
-	
-	switch loggingLevel {
-	case constant.ERROR:
-		ErrorLogger.Fatalln(message)
-	case constant.INFO:
-		InfoLogger.Println(message)
-	case constant.DEBUG:
-		DebugLogger.Println(message)
-	case constant.WARN:
-		WarnLogger.Println(message)
-	}
-}
+func PrintMessage(){}
 
 // Print message to terminal or file as metioned in config file
 func RedirectLogger(){}
 
 //Get log level from config
-func LogLevel() string { 
-	level := GlobalLoggingConfig.GetLoggingLevel()
-	if level == "" {
-		GlobalLoggingConfig.SetLoggingLevel(constant.INFO)
-		return constant.INFO
-	}
-	return level
-}
+func LogLevel() {}
